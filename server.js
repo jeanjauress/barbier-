@@ -52,6 +52,11 @@ function tooMany(ip) {
   hits.set(ip, recent);
   return recent.length > 5;
 }
+// Oublie régulièrement les IP inactives pour que la mémoire ne grossisse pas indéfiniment en ligne
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, times] of hits) if (times.every((t) => now - t >= 10 * 60 * 1000)) hits.delete(ip);
+}, 10 * 60 * 1000).unref();
 
 function sendJson(res, status, obj) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });

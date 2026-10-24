@@ -83,3 +83,10 @@ La base peut aussi s'ouvrir avec pgAdmin (installé avec PostgreSQL) ou DBeaver.
 ## Hébergement
 
 Il faut un hébergeur qui exécute Node.js et une base PostgreSQL hébergée (Render, Neon, Supabase…). Mettez l'adresse de connexion fournie dans `DATABASE_URL` : elle remplace les variables `PG…`.
+
+### Sur Render
+
+- Base : `barbier-db` (Francfort). L'offre gratuite expire au bout de 30 jours : passez-la en payant avant, sinon les réservations sont perdues.
+- Service web : runtime Node, build `npm install`, démarrage `npm start`, région Francfort.
+- Variables d'environnement du service : `DATABASE_URL` (adresse *interne* de la base), `ADMIN_TOKEN`, `OWNER_WHATSAPP`, `WHATSAPP_PROVIDER`, `CALLMEBOT_APIKEY` (ou les variables Twilio). `PORT` est fourni par Render.
+- Chaque `git push` sur `main` redéploie le site automatiquement.
