@@ -115,11 +115,12 @@ async function listReservations(req, res) {
   sendJson(res, 200, rows);
 }
 
-// Fichiers statiques : uniquement la page et les images
+// Fichiers statiques : uniquement les pages et les images
 const TYPES = { '.html': 'text/html; charset=utf-8', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 function serveStatic(pathname, res) {
   let file;
   if (pathname === '/' || pathname === '/index.html') file = 'index.html';
+  else if (pathname === '/admin' || pathname === '/admin/') file = 'admin.html';
   else if (/^\/img\/[\w-]+\.(jpe?g|png|webp)$/.test(pathname)) file = pathname.slice(1);
   if (!file) { res.writeHead(404); return res.end('Page introuvable'); }
 

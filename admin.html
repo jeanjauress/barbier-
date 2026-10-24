@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Réservations · Le Fil du Rasoir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Big+Shoulders+Text:wght@700&family=Libre+Franklin:wght@400;600&display=swap">
+<style>
+/* Page d'administration : mot de passe, puis liste des demandes de réservation. Mêmes couleurs que le site. */
+:root {
+  --bg: #0f1915; --surface: #16231e; --surface-2: #1d2c26;
+  --ink: #ece4d3; --muted: #a4a898; --brass: #d1a85a; --oxblood: #a3343f;
+  --ok: #7fb58a; --line: rgba(236, 228, 211, .14);
+  --f-display: "Rozha One", Georgia, serif;
+  --f-label: "Big Shoulders Text", "Arial Narrow", sans-serif;
+  --f-body: "Libre Franklin", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f0ebdf; --surface: #e6dfcf; --surface-2: #dcd3bf;
+    --ink: #17231e; --muted: #59605a; --brass: #87611c; --oxblood: #8c2531;
+    --ok: #2f6b3c; --line: rgba(23, 35, 30, .16);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f0ebdf; --surface: #e6dfcf; --surface-2: #dcd3bf;
+  --ink: #17231e; --muted: #59605a; --brass: #87611c; --oxblood: #8c2531;
+  --ok: #2f6b3c; --line: rgba(23, 35, 30, .16);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); line-height: 1.5; }
+.wrap { max-width: 1100px; margin-inline: auto; padding: 32px 16px 64px; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1.05; margin: 0 0 4px; }
+.label { font-family: var(--f-label); font-weight: 700; text-transform: uppercase; letter-spacing: .14em; font-size: .85rem; color: var(--brass); }
+.muted { color: var(--muted); }
+a { color: var(--brass); }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+button, input { font: inherit; }
+button {
+  background: var(--brass); color: #0f1915; border: 0; border-radius: 4px;
+  padding: 10px 18px; font-weight: 600; cursor: pointer;
+}
+button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+input {
+  width: 100%; padding: 10px 12px; border-radius: 4px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+
+.login { max-width: 360px; margin-top: 32px; display: grid; gap: 12px; }
+.error { color: var(--oxblood); font-weight: 600; }
+
+.bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 24px 0 16px; }
+.bar .actions { display: flex; gap: 8px; }
+.stats { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; min-width: 140px; }
+.stat b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.8rem; line-height: 1.1; }
+
+table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 6px; overflow: hidden; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--f-label); text-transform: uppercase; letter-spacing: .1em; font-size: .8rem; color: var(--muted); background: var(--surface-2); }
+tr.past td { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tag { display: inline-block; font-size: .8rem; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); white-space: nowrap; }
+.tag.ok { color: var(--ok); border-color: currentColor; }
+.tag.ko { color: var(--oxblood); border-color: currentColor; }
+.empty { padding: 32px; text-align: center; background: var(--surface); border-radius: 6px; }
+
+/* Sur téléphone : chaque réservation devient une fiche */
+@media (max-width: 720px) {
+  thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  table { background: none; }
+  tr { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; margin-bottom: 12px; padding: 8px 0; }
+  td { border: 0; padding: 4px 14px; display: flex; gap: 12px; }
+  td::before { content: attr(data-label); flex: 0 0 96px; color: var(--muted); font-size: .85rem; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="label">Le Fil du Rasoir</p>
+  <h1>Réservations</h1>
+
+  <form class="login" id="login">
+    <label for="token">Mot de passe administrateur</label>
+    <input id="token" type="password" autocomplete="current-password" required>
+    <button type="submit">Voir les réservations</button>
+    <p class="error" id="loginError" hidden></p>
+  </form>
+
+  <section id="panel" hidden>
+    <div class="bar">
+      <p class="muted" id="updated"></p>
+      <div class="actions">
+        <button type="button" id="refresh">Actualiser</button>
+        <button type="button" class="ghost" id="logout">Se déconnecter</button>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <p class="error" id="listError" hidden></p>
+    <div id="list"></div>
+  </section>
+</main>
+
+<script>
+const KEY = 'barbier-admin-token';
+const store = {
+  get() { try { return sessionStorage.getItem(KEY); } catch (e) { return null; } },
+  set(v) { try { sessionStorage.setItem(KEY, v); } catch (e) { /* navigation privée */ } },
+  clear() { try { sessionStorage.removeItem(KEY); } catch (e) { /* idem */ } },
+};
+let token = store.get();
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, text) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (text != null) n.textContent = text;
+  return n;
+};
+
+function todayIso() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function formatDay(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+function waLink(phone) {
+  return 'https://wa.me/' + phone.replace(/\D/g, '');
+}
+
+function showLogin(message) {
+  $('panel').hidden = true;
+  $('login').hidden = false;
+  $('loginError').hidden = !message;
+  $('loginError').textContent = message || '';
+  $('token').focus();
+}
+
+async function load() {
+  $('listError').hidden = true;
+  let res;
+  try {
+    res = await fetch('/api/reservations', { headers: { Authorization: `Bearer ${token}` } });
+  } catch (e) {
+    $('listError').textContent = 'Impossible de joindre le serveur. Vérifiez la connexion internet.';
+    $('listError').hidden = false;
+    return;
+  }
+  if (res.status === 401) { store.clear(); token = null; return showLogin('Mot de passe incorrect.'); }
+  if (!res.ok) {
+    $('listError').textContent = 'Erreur du serveur. Réessayez dans un instant.';
+    $('listError').hidden = false;
+    return;
+  }
+  render(await res.json());
+  $('login').hidden = true;
+  $('panel').hidden = false;
+}
+
+function render(rows) {
+  const today = todayIso();
+  const upcoming = rows.filter((r) => r.day >= today);
+  const stats = $('stats');
+  stats.replaceChildren(
+    stat('À venir', upcoming.length),
+    stat("Aujourd'hui", rows.filter((r) => r.day === today).length),
+    stat('Total', rows.length),
+  );
+  $('updated').textContent = 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+  const list = $('list');
+  if (!rows.length) {
+    list.replaceChildren(el('p', { class: 'empty muted' }, 'Aucune réservation pour le moment.'));
+    return;
+  }
+  // Les prochains rendez-vous d'abord (du plus proche au plus lointain), puis les passés (du plus récent au plus ancien)
+  const past = rows.filter((r) => r.day < today);
+  const sorted = [
+    ...upcoming.sort((a, b) => a.day.localeCompare(b.day) || a.id - b.id),
+    ...past.sort((a, b) => b.day.localeCompare(a.day) || b.id - a.id),
+  ];
+
+  const table = el('table');
+  const head = el('tr');
+  ['N°', 'Jour', 'Moment', 'Client', 'WhatsApp', 'Prestation', 'Reçue le', 'Notification'].forEach((h) => head.append(el('th', {}, h)));
+  const thead = el('thead');
+  thead.append(head);
+  table.append(thead);
+  const body = el('tbody');
+  for (const r of sorted) {
+    const tr = el('tr', r.day < today ? { class: 'past' } : {});
+    tr.append(
+      el('td', { 'data-label': 'N°', class: 'num' }, r.id),
+      el('td', { 'data-label': 'Jour', class: 'num' }, formatDay(r.day)),
+      el('td', { 'data-label': 'Moment' }, r.slot),
+      el('td', { 'data-label': 'Client' }, r.name),
+    );
+    const phone = el('td', { 'data-label': 'WhatsApp', class: 'num' });
+    phone.append(el('a', { href: waLink(r.phone), target: '_blank', rel: 'noopener' }, r.phone));
+    tr.append(
+      phone,
+      el('td', { 'data-label': 'Prestation' }, r.service),
+      el('td', { 'data-label': 'Reçue le', class: 'num' }, r.created_at),
+    );
+    const notif = el('td', { 'data-label': 'Notification' });
+    notif.append(r.notified
+      ? el('span', { class: 'tag ok' }, 'Envoyée')
+      : el('span', { class: 'tag ko', title: r.notify_error || '' }, 'Échec'));
+    tr.append(notif);
+    body.append(tr);
+  }
+  table.append(body);
+  list.replaceChildren(table);
+}
+
+function stat(label, value) {
+  const box = el('div', { class: 'stat' });
+  box.append(el('b', {}, value), el('span', { class: 'muted' }, label));
+  return box;
+}
+
+$('login').addEventListener('submit', (e) => {
+  e.preventDefault();
+  token = $('token').value.trim();
+  store.set(token);
+  $('token').value = '';
+  load();
+});
+$('refresh').addEventListener('click', load);
+$('logout').addEventListener('click', () => { store.clear(); token = null; showLogin(); });
+
+if (token) load(); else showLogin();
+</script>
+</body>
+</html>

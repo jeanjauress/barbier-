@@ -60,6 +60,10 @@ Idéal pour envoyer des messages à **son propre numéro**.
 
 ## Consulter les réservations
 
+Ouvrir `/admin` (en ligne : https://barbier.onrender.com/admin) et saisir le mot de passe `ADMIN_TOKEN`.
+
+Ou en ligne de commande :
+
 ```
 curl http://localhost:3000/api/reservations -H "Authorization: Bearer <ADMIN_TOKEN>"
 ```
@@ -73,6 +77,7 @@ La base peut aussi s'ouvrir avec pgAdmin (installé avec PostgreSQL) ou DBeaver.
 | Fichier | Rôle |
 |---|---|
 | `index.html` | La page du site |
+| `admin.html` | La page `/admin` : liste des réservations, protégée par `ADMIN_TOKEN` |
 | `server.js` | Serveur web, API `/api/reservations` |
 | `db.js` | Connexion PostgreSQL et création du tableau |
 | `whatsapp.js` | Envoi du message au propriétaire |
