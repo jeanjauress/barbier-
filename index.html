@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Fil du Rasoir</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Big+Shoulders+Text:wght@500;700;800&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout : vitrine de barbier. Bandeau-enseigne, menu des prix à points de conduite, galerie en mosaïque, rituel du rasage, horaires + réservation. Bandes pleine largeur, contenu centré sur 1180px. */
+:root {
+  --bg: #0f1915;        /* vert bouteille presque noir */
+  --surface: #16231e;
+  --surface-2: #1d2c26;
+  --ink: #ece4d3;       /* os / ivoire */
+  --muted: #a4a898;
+  --brass: #d1a85a;     /* laiton des fauteuils */
+  --oxblood: #a3343f;   /* rouge du poteau de barbier */
+  --line: rgba(236, 228, 211, .14);
+  --shade: rgba(8, 14, 11, .72);
+
+  --f-display: "Rozha One", "Bodoni 72", Didot, Georgia, serif;
+  --f-label: "Big Shoulders Text", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Libre Franklin", "Segoe UI", system-ui, sans-serif;
+
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --step-3: clamp(2rem, 4vw, 2.75rem);
+  --step-4: clamp(2.6rem, 7vw, 5.25rem);
+
+  --wrap: 1180px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f0ebdf; --surface: #e6dfcf; --surface-2: #dcd3bf;
+    --ink: #17231e; --muted: #59605a; --brass: #87611c; --oxblood: #8c2531;
+    --line: rgba(23, 35, 30, .16); --shade: rgba(15, 25, 21, .66);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f0ebdf; --surface: #e6dfcf; --surface-2: #dcd3bf;
+  --ink: #17231e; --muted: #59605a; --brass: #87611c; --oxblood: #8c2531;
+  --line: rgba(23, 35, 30, .16); --shade: rgba(15, 25, 21, .66);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg);
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+.wrap {
+  max-width: var(--wrap); margin-inline: auto;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+}
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; line-height: 1.02; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.label {
+  font-family: var(--f-label); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .14em; font-size: .85rem; color: var(--brass);
+}
+
+/* Poteau de barbier : la seule animation de la page */
+.pole {
+  height: 10px;
+  background: repeating-linear-gradient(-45deg,
+    var(--oxblood) 0 14px, var(--ink) 14px 28px, var(--bg) 28px 42px, var(--ink) 42px 56px);
+  background-size: 79.2px 10px;
+  animation: pole 3.5s linear infinite;
+}
+@keyframes pole { to { background-position: 79.2px 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .pole { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* En-tête */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.top .wrap {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 12px;
+}
+.brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+.brand b { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; line-height: 1; }
+.brand span { font-family: var(--f-label); font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.nav { display: flex; align-items: center; gap: 22px; }
+.nav a {
+  font-family: var(--f-label); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .12em; font-size: .9rem; text-decoration: none; color: var(--muted);
+}
+.nav a:hover { color: var(--ink); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--f-label); font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+  font-size: .95rem; text-decoration: none; cursor: pointer;
+  padding: 12px 22px; border: 1.5px solid var(--brass); border-radius: 2px;
+  background: var(--brass); color: var(--bg);
+  transition: background .2s, color .2s;
+}
+.btn:hover { background: transparent; color: var(--brass); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--brass); color: var(--brass); }
+.nav .btn { color: var(--bg); padding: 9px 16px; }
+.nav .btn:hover { color: var(--brass); }
+@media (max-width: 760px) { .nav a:not(.btn) { display: none; } }
+
+/* Hero */
+.hero .wrap {
+  display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(24px, 4vw, 56px);
+  align-items: center; padding-block: clamp(36px, 6vw, 72px);
+}
+.hero-text { display: grid; gap: 22px; min-width: 0; }
+.hero h1 { font-size: var(--step-4); }
+.hero h1 em { font-style: normal; color: var(--brass); }
+.hero-lede { font-size: 1.12rem; color: var(--muted); max-width: 46ch; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-photo { position: relative; min-width: 0; }
+.hero-photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px; }
+.hero-photo figcaption {
+  position: absolute; left: 14px; bottom: 14px;
+  background: var(--shade); color: #ece4d3; backdrop-filter: blur(4px);
+  padding: 8px 12px; font-family: var(--f-label); font-weight: 700;
+  font-size: .8rem; letter-spacing: .14em; text-transform: uppercase;
+}
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+}
+
+.facts { border-block: 1px solid var(--line); }
+.facts ul {
+  list-style: none; margin: 0; padding-block: 18px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+.facts li { display: grid; gap: 2px; }
+.facts strong { font-family: var(--f-display); font-weight: 400; font-size: 1.6rem; line-height: 1.1; }
+.facts span { color: var(--muted); font-size: .92rem; }
+@media (max-width: 760px) { .facts ul { grid-template-columns: repeat(2, 1fr); } }
+
+/* Sections */
+section { scroll-margin-top: 72px; }
+.block { padding-block: clamp(56px, 8vw, 96px); }
+.head { display: grid; gap: 12px; margin-bottom: clamp(28px, 4vw, 44px); max-width: 680px; }
+.head h2 { font-size: var(--step-3); }
+.head p { color: var(--muted); }
+
+/* Carte des prestations */
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: clamp(24px, 4vw, 48px); align-items: start; }
+.menu-col { display: grid; gap: 30px; min-width: 0; }
+.menu-group h3 {
+  font-family: var(--f-label); font-weight: 800; font-size: 1.15rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--brass);
+  padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 6px;
+}
+.item { padding-block: 12px; border-bottom: 1px dashed var(--line); }
+.item-row { display: flex; align-items: baseline; gap: 8px; }
+.item-name { font-weight: 600; }
+.leader { flex: 1; border-bottom: 2px dotted var(--muted); opacity: .45; transform: translateY(-4px); min-width: 16px; }
+.price { font-family: var(--f-label); font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.item small { display: block; color: var(--muted); font-size: .88rem; margin-top: 2px; }
+.menu-photo { display: grid; gap: 14px; }
+.menu-photo img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 2px; }
+.menu-photo p { color: var(--muted); font-size: .9rem; }
+@media (max-width: 960px) {
+  .menu-grid { grid-template-columns: 1fr 1fr; }
+  .menu-photo { grid-column: 1 / -1; grid-template-columns: 1fr 1.4fr; align-items: center; }
+  .menu-photo img { aspect-ratio: 4 / 3; }
+}
+@media (max-width: 640px) {
+  .menu-grid { grid-template-columns: 1fr; }
+  .menu-photo { grid-template-columns: 1fr; }
+}
+
+/* Galerie */
+.gallery { background: var(--surface); }
+.mosaic {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: clamp(150px, 19vw, 230px); grid-auto-flow: dense; gap: 12px;
+}
+.tile {
+  position: relative; overflow: hidden; border: 0; padding: 0; margin: 0;
+  background: var(--surface-2); cursor: zoom-in; border-radius: 2px; text-align: left;
+}
+.tile.tall { grid-row: span 2; }
+.tile img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.tile:hover img { transform: scale(1.04); }
+.tile span {
+  position: absolute; inset: auto 0 0 0; padding: 28px 14px 12px;
+  background: linear-gradient(to top, rgba(8, 14, 11, .85), transparent);
+  color: #ece4d3; display: grid; gap: 0;
+}
+.tile b { font-family: var(--f-display); font-weight: 400; font-size: 1.3rem; line-height: 1.1; }
+.tile i { font-style: normal; font-family: var(--f-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; font-size: .78rem; color: #d9bd83; }
+@media (prefers-reduced-motion: reduce) { .tile img { transition: none; } }
+@media (max-width: 640px) {
+  .mosaic { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+}
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 50; background: rgba(6, 10, 8, .92);
+  display: grid; place-items: center; gap: 12px; align-content: center;
+  padding: max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.lightbox img { max-height: 78vh; width: auto; border-radius: 2px; }
+.lightbox p { color: #ece4d3; font-family: var(--f-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; text-align: center; }
+.lightbox button {
+  position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px));
+  background: transparent; color: #ece4d3; border: 1px solid rgba(236, 228, 211, .4);
+  font-family: var(--f-label); font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  padding: 8px 14px; cursor: pointer; border-radius: 2px;
+}
+
+/* Rituel */
+.ritual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+.ritual-photos { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; align-items: end; min-width: 0; }
+.ritual-photos img { width: 100%; object-fit: cover; border-radius: 2px; }
+.ritual-photos img:first-child { aspect-ratio: 3 / 4; }
+.ritual-photos img:last-child { aspect-ratio: 1 / 1; margin-bottom: 40px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s; min-width: 0; }
+.steps li {
+  counter-increment: s; display: grid; grid-template-columns: 52px 1fr; gap: 14px;
+  padding-block: 16px; border-top: 1px solid var(--line);
+}
+.steps li:last-child { border-bottom: 1px solid var(--line); }
+.steps li::before {
+  content: counter(s, decimal-leading-zero);
+  font-family: var(--f-display); font-size: 1.6rem; line-height: 1; color: var(--oxblood);
+}
+.steps strong { display: block; font-weight: 600; }
+.steps span { color: var(--muted); font-size: .95rem; }
+.ritual-note { margin-top: 18px; color: var(--muted); font-size: .95rem; }
+.ritual-note b { color: var(--ink); }
+@media (max-width: 860px) { .ritual-grid { grid-template-columns: 1fr; } }
+
+/* Le salon */
+.salon { background: var(--surface); }
+.salon-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 12px; }
+.salon-grid img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 3; border-radius: 2px; }
+.salon-copy {
+  background: var(--bg); padding: clamp(20px, 3vw, 32px); display: grid; gap: 14px; align-content: center; min-width: 0;
+  border: 1px solid var(--line); border-radius: 2px;
+}
+.salon-copy h2 { font-size: var(--step-3); }
+.salon-copy p { color: var(--muted); }
+@media (max-width: 860px) {
+  .salon-grid { grid-template-columns: 1fr 1fr; }
+  .salon-copy { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) { .salon-grid { grid-template-columns: 1fr; } }
+
+/* Horaires + réservation */
+.visit-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+.hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hours th, .hours td { text-align: left; padding: 11px 0; border-bottom: 1px solid var(--line); font-weight: 400; }
+.hours td { text-align: right; font-family: var(--f-label); font-weight: 700; font-size: 1.05rem; letter-spacing: .04em; }
+.hours tr.today th, .hours tr.today td { color: var(--brass); }
+.hours tr.today th::after {
+  content: "aujourd’hui"; margin-left: 10px; font-family: var(--f-label); font-weight: 700;
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  border: 1px solid var(--brass); padding: 1px 6px; border-radius: 2px; vertical-align: 2px;
+}
+.hours .closed { color: var(--muted); }
+.contact { display: grid; gap: 16px; margin-top: 28px; }
+.contact-row { display: grid; gap: 2px; }
+.contact-row .val { font-size: 1.1rem; font-weight: 600; user-select: all; }
+.walkin { margin-top: 24px; padding: 14px 16px; border-left: 3px solid var(--oxblood); background: var(--surface); color: var(--muted); font-size: .95rem; }
+.walkin b { color: var(--ink); }
+
+.book { background: var(--surface); padding: clamp(20px, 3vw, 32px); border-radius: 2px; display: grid; gap: 18px; min-width: 0; }
+.book h3 { font-size: var(--step-2); }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-family: var(--f-label); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; color: var(--muted); }
+.field input, .field select {
+  font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 2px; padding: 11px 12px; width: 100%;
+}
+.field input:focus, .field select:focus { outline: 2px solid var(--brass); outline-offset: 0; border-color: transparent; }
+.error { color: var(--oxblood); font-size: .9rem; font-weight: 600; }
+.ok { padding: 14px 16px; border-left: 3px solid var(--brass); background: var(--bg); }
+.ok b { display: block; }
+.ok span { color: var(--muted); font-size: .95rem; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.book .btn:disabled { opacity: .6; cursor: wait; }
+.msg { display: grid; gap: 12px; padding-top: 16px; border-top: 1px dashed var(--line); }
+.msg pre {
+  margin: 0; white-space: pre-wrap; font-family: var(--f-body); font-size: .98rem;
+  background: var(--bg); padding: 14px; border-radius: 2px; border: 1px solid var(--line);
+}
+.msg-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.msg-hint { color: var(--muted); font-size: .9rem; }
+@media (max-width: 860px) { .visit-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .fields { grid-template-columns: 1fr; } }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-block: 24px; color: var(--muted); font-size: .88rem; }
+</style>
+</head>
+<body>
+
+<div class="pole" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#accueil"><b>Le Fil du Rasoir</b><span>Barbier · Cocody</span></a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#prestations">Prestations</a>
+      <a href="#galerie">Galerie</a>
+      <a href="#rituel">Rasage</a>
+      <a href="#visite">Horaires</a>
+      <a class="btn" href="#reserver">Réserver</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="accueil">
+    <div class="wrap">
+      <div class="hero-text">
+        <p class="label">Barbier pour homme · depuis 2014</p>
+        <h1>Coupe nette.<br><em>Barbe tenue.</em></h1>
+        <p class="hero-lede">Dégradés, contours au rasoir et rasage à l’ancienne à la serviette chaude. Trois fauteuils, trois barbiers, et le temps qu’il faut pour chaque client.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#reserver">Prendre rendez-vous</a>
+          <a class="btn ghost" href="#prestations">Voir les tarifs</a>
+        </div>
+      </div>
+      <figure class="hero-photo" style="margin:0">
+        <img src="img/salon.jpg" alt="Intérieur du salon : trois fauteuils de barbier en cuir noir devant un mur de briques et des miroirs éclairés">
+        <figcaption>Le salon · 3 fauteuils</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="facts">
+    <div class="wrap">
+      <ul>
+        <li><strong>3 barbiers</strong><span>formés au dégradé et au coupe-chou</span></li>
+        <li><strong>45 min</strong><span>pour une coupe + barbe, sans presse</span></li>
+        <li><strong>Sans RDV</strong><span>du mardi au vendredi, 9h–12h</span></li>
+        <li><strong>Serviette chaude</strong><span>offerte avec chaque rasage</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="block" id="prestations">
+    <div class="wrap">
+      <div class="head">
+        <p class="label">La carte</p>
+        <h2>Prestations et tarifs</h2>
+        <p>Prix en francs CFA, shampoing et coiffage compris. La durée indiquée est le temps passé au fauteuil.</p>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-col">
+          <div class="menu-group">
+            <h3>Coupes</h3>
+            <div class="item"><div class="item-row"><span class="item-name">Coupe classique</span><span class="leader"></span><span class="price">5 000</span></div><small>Ciseaux et tondeuse · 30 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Dégradé</span><span class="leader"></span><span class="price">6 000</span></div><small>Bas, moyen ou haut, du sabot 0 au n°3 · 40 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Taper afro &amp; twists</span><span class="leader"></span><span class="price">7 000</span></div><small>Dégradé tempes et nuque, éponge à twists · 45 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Coupe enfant</span><span class="leader"></span><span class="price">3 500</span></div><small>Moins de 12 ans · 25 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Contours seuls</span><span class="leader"></span><span class="price">2 000</span></div><small>Ligne front, tempes et nuque au rasoir · 15 min</small></div>
+          </div>
+        </div>
+        <div class="menu-col">
+          <div class="menu-group">
+            <h3>Barbe &amp; rasage</h3>
+            <div class="item"><div class="item-row"><span class="item-name">Taille de barbe</span><span class="leader"></span><span class="price">3 000</span></div><small>Mise en forme, contours, huile · 20 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Rasage à l’ancienne</span><span class="leader"></span><span class="price">5 000</span></div><small>Serviette chaude, blaireau, coupe-chou · 30 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Soin visage</span><span class="leader"></span><span class="price">4 000</span></div><small>Gommage, masque, serviette chaude · 25 min</small></div>
+          </div>
+          <div class="menu-group">
+            <h3>Formules</h3>
+            <div class="item"><div class="item-row"><span class="item-name">Coupe + barbe</span><span class="leader"></span><span class="price">8 000</span></div><small>Dégradé et taille de barbe · 45 min</small></div>
+            <div class="item"><div class="item-row"><span class="item-name">Le Grand Jour</span><span class="leader"></span><span class="price">15 000</span></div><small>Coupe, rasage à l’ancienne et soin visage, pour un mariage ou un entretien · 1 h 30</small></div>
+          </div>
+        </div>
+        <figure class="menu-photo" style="margin:0">
+          <img src="img/brushing.jpg" alt="Un barbier sèche et coiffe les cheveux d’un client barbu installé au fauteuil" loading="lazy">
+          <p>Chaque coupe se termine par un coiffage au séchoir et le produit adapté à votre cheveu : cire, pommade ou crème.</p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="block gallery" id="galerie">
+    <div class="wrap">
+      <div class="head">
+        <p class="label">Galerie</p>
+        <h2>Le travail au fauteuil</h2>
+        <p>Quelques coupes et barbes réalisées au salon. Touchez une photo pour l’agrandir.</p>
+      </div>
+      <div class="mosaic" id="mosaic">
+        <button class="tile tall" type="button" data-src="img/afro.jpg" data-cap="Taper afro · mèches dorées"><img src="img/afro.jpg" alt="Un barbier réalise un taper sur des cheveux afro bouclés aux pointes dorées" loading="lazy"><span><b>Taper afro</b><i>Tempes au sabot 0,5</i></span></button>
+        <button class="tile" type="button" data-src="img/coupe-texture.jpg" data-cap="Coupe texturée · dégradé haut"><img src="img/coupe-texture.jpg" alt="Coupe texturée sur le dessus avec un dégradé haut sur la nuque" loading="lazy"><span><b>Coupe texturée</b><i>Dégradé haut</i></span></button>
+        <button class="tile tall" type="button" data-src="img/contours.jpg" data-cap="Contours au rasoir · barbe dessinée"><img src="img/contours.jpg" alt="Le barbier trace les contours de la tempe au rasoir sur un client barbu" loading="lazy"><span><b>Contours au rasoir</b><i>Tempe et barbe</i></span></button>
+        <button class="tile" type="button" data-src="img/tondeuse.jpg" data-cap="Finition de nuque à la tondeuse"><img src="img/tondeuse.jpg" alt="Finition de la nuque à la tondeuse par un barbier aux avant-bras tatoués" loading="lazy"><span><b>Nuque nette</b><i>Finition tondeuse</i></span></button>
+        <button class="tile tall" type="button" data-src="img/barbe-nb.jpg" data-cap="Taille de barbe aux ciseaux"><img src="img/barbe-nb.jpg" alt="Photo noir et blanc : taille d’une barbe fournie aux ciseaux" loading="lazy"><span><b>Barbe longue</b><i>Taille aux ciseaux</i></span></button>
+        <button class="tile" type="button" data-src="img/classique.jpg" data-cap="Coupe classique · raie sur le côté"><img src="img/classique.jpg" alt="Un barbier en chemise et casquette coiffe un client pour une coupe classique" loading="lazy"><span><b>Coupe classique</b><i>Raie sur le côté</i></span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="rituel">
+    <div class="wrap ritual-grid">
+      <div class="ritual-photos">
+        <img src="img/barbe-ciseaux.jpg" alt="Client renversé dans le fauteuil pendant la taille de sa barbe aux ciseaux" loading="lazy">
+        <img src="img/rasage.jpg" alt="Application de mousse à raser au blaireau sur le cou d’un client" loading="lazy">
+      </div>
+      <div>
+        <div class="head" style="margin-bottom:24px">
+          <p class="label">Rasage à l’ancienne</p>
+          <h2>Trente minutes, cinq étapes</h2>
+        </div>
+        <ol class="steps">
+          <li><div><strong>Serviette chaude</strong><span>Deux minutes pour ouvrir les pores et ramollir le poil.</span></div></li>
+          <li><div><strong>Huile pré-rasage</strong><span>Une fine couche qui protège la peau du passage de la lame.</span></div></li>
+          <li><div><strong>Mousse au blaireau</strong><span>Montée à la main, appliquée en cercles pour relever chaque poil.</span></div></li>
+          <li><div><strong>Coupe-chou, deux passes</strong><span>Une dans le sens du poil, une en travers. Lame neuve pour chaque client.</span></div></li>
+          <li><div><strong>Serviette froide et baume</strong><span>Pour refermer la peau et calmer le feu du rasoir.</span></div></li>
+        </ol>
+        <p class="ritual-note"><b>Peau sensible ?</b> Dites-le au barbier : on passe à une seule passe et un baume sans alcool.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block salon" id="salon">
+    <div class="wrap salon-grid">
+      <div class="salon-copy">
+        <p class="label">Le salon</p>
+        <h2>Fauteuils en cuir, lames affûtées</h2>
+        <p>Nos fauteuils hydrauliques datent des années 60 et ont été retapissés en cuir. Les outils sont désinfectés entre chaque client, et les lames de rasoir ne servent qu’une fois.</p>
+        <p>Café ou thé offert pendant l’attente.</p>
+      </div>
+      <img src="img/fauteuil.jpg" alt="Fauteuil de barbier vintage en cuir capitonné marron et chrome" loading="lazy">
+      <img src="img/outils.jpg" alt="Tondeuses, ciseaux, peigne et pots de cire posés sur une ardoise" loading="lazy">
+    </div>
+  </section>
+
+  <section class="block" id="visite">
+    <div class="wrap visit-grid">
+      <div>
+        <div class="head" style="margin-bottom:20px">
+          <p class="label">Nous trouver</p>
+          <h2>Horaires et adresse</h2>
+        </div>
+        <table class="hours" id="hours">
+          <tbody>
+            <tr data-day="1"><th scope="row">Lundi</th><td class="closed">Fermé</td></tr>
+            <tr data-day="2"><th scope="row">Mardi</th><td>9h – 20h</td></tr>
+            <tr data-day="3"><th scope="row">Mercredi</th><td>9h – 20h</td></tr>
+            <tr data-day="4"><th scope="row">Jeudi</th><td>9h – 20h</td></tr>
+            <tr data-day="5"><th scope="row">Vendredi</th><td>9h – 21h</td></tr>
+            <tr data-day="6"><th scope="row">Samedi</th><td>8h – 21h</td></tr>
+            <tr data-day="0"><th scope="row">Dimanche</th><td>10h – 16h</td></tr>
+          </tbody>
+        </table>
+        <div class="contact">
+          <div class="contact-row"><span class="label">Adresse</span><span class="val">Rue des Jardins, Cocody · Abidjan</span></div>
+          <div class="contact-row"><span class="label">Téléphone &amp; WhatsApp</span><span class="val" id="phone">+225 07 00 00 00 00</span></div>
+        </div>
+        <p class="walkin"><b>Sans rendez-vous</b> du mardi au vendredi de 9h à 12h. Le samedi, réservez : les créneaux partent dès le jeudi.</p>
+      </div>
+
+      <form class="book" id="reserver" novalidate>
+        <div>
+          <p class="label">Réservation</p>
+          <h3>Préparez votre demande</h3>
+        </div>
+        <div class="fields">
+          <div class="field">
+            <label for="b-name">Votre prénom</label>
+            <input id="b-name" name="name" type="text" autocomplete="given-name" maxlength="60" placeholder="Ex. Yannick">
+          </div>
+          <div class="field">
+            <label for="b-phone">Votre WhatsApp</label>
+            <input id="b-phone" name="phone" type="tel" autocomplete="tel" maxlength="25" placeholder="Ex. 07 12 34 56 78">
+          </div>
+          <div class="hp" aria-hidden="true">
+            <label for="b-website">Ne pas remplir</label>
+            <input id="b-website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="field full">
+            <label for="b-service">Prestation</label>
+            <select id="b-service" name="service">
+              <option>Coupe classique · 5 000 FCFA</option>
+              <option selected>Dégradé · 6 000 FCFA</option>
+              <option>Taper afro &amp; twists · 7 000 FCFA</option>
+              <option>Coupe enfant · 3 500 FCFA</option>
+              <option>Contours seuls · 2 000 FCFA</option>
+              <option>Taille de barbe · 3 000 FCFA</option>
+              <option>Rasage à l’ancienne · 5 000 FCFA</option>
+              <option>Soin visage · 4 000 FCFA</option>
+              <option>Coupe + barbe · 8 000 FCFA</option>
+              <option>Le Grand Jour · 15 000 FCFA</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="b-date">Jour</label>
+            <input id="b-date" name="date" type="date">
+          </div>
+          <div class="field">
+            <label for="b-slot">Moment</label>
+            <select id="b-slot" name="slot">
+              <option>Matin (avant 12h)</option>
+              <option selected>Après-midi (12h–17h)</option>
+              <option>Fin de journée (après 17h)</option>
+            </select>
+          </div>
+        </div>
+        <p class="error" id="b-error" hidden></p>
+        <button class="btn" type="submit" id="b-submit">Envoyer la demande</button>
+        <p class="ok" id="b-ok" hidden role="status"><b></b><span>Le barbier vous confirme l’heure exacte sur WhatsApp.</span></p>
+        <div class="msg" id="b-msg" hidden>
+          <pre id="b-text"></pre>
+          <div class="msg-actions">
+            <button class="btn ghost" type="button" id="b-copy">Copier le message</button>
+            <span class="msg-hint" id="b-hint">Envoyez-le par WhatsApp ou SMS au +225 07 00 00 00 00. Le barbier vous confirme l’heure exacte.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Le Fil du Rasoir · Barbier pour homme · Cocody, Abidjan</span>
+    <span>Photos : Unsplash</span>
+  </div>
+</footer>
+<div class="pole" aria-hidden="true"></div>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
+  <button type="button" id="lb-close">Fermer</button>
+  <img id="lb-img" src="" alt="">
+  <p id="lb-cap"></p>
+</div>
+
+<script>
+(function () {
+  // Horaires : surligner le jour courant
+  var today = new Date().getDay();
+  var row = document.querySelector('#hours tr[data-day="' + today + '"]');
+  if (row) row.classList.add('today');
+
+  // Galerie : agrandissement
+  var lb = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lb-img');
+  var lbCap = document.getElementById('lb-cap');
+  var lastTile = null;
+  document.getElementById('mosaic').addEventListener('click', function (e) {
+    var tile = e.target.closest('.tile');
+    if (!tile) return;
+    lastTile = tile;
+    lbImg.src = tile.dataset.src;
+    lbImg.alt = tile.querySelector('img').alt;
+    lbCap.textContent = tile.dataset.cap;
+    lb.hidden = false;
+    document.getElementById('lb-close').focus();
+  });
+  function closeLb() { lb.hidden = true; if (lastTile) lastTile.focus(); }
+  document.getElementById('lb-close').addEventListener('click', closeLb);
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
+
+  // Réservation : date par défaut = prochain jour ouvert (pas le lundi)
+  var dateInput = document.getElementById('b-date');
+  function iso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  var d = new Date(); d.setDate(d.getDate() + 1);
+  if (d.getDay() === 1) d.setDate(d.getDate() + 1);
+  if (!dateInput.value) dateInput.value = iso(d);
+  dateInput.min = iso(new Date());
+
+  var form = document.getElementById('reserver');
+  var err = document.getElementById('b-error');
+  var box = document.getElementById('b-msg');
+  var out = document.getElementById('b-text');
+  var hint = document.getElementById('b-hint');
+  var defaultHint = hint.textContent;
+
+  var ok = document.getElementById('b-ok');
+  var submitBtn = document.getElementById('b-submit');
+
+  function showError(text) { err.textContent = text; err.hidden = false; }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('b-name').value.trim();
+    var phone = document.getElementById('b-phone').value.trim();
+    var service = document.getElementById('b-service').value;
+    var slotRaw = document.getElementById('b-slot').value;
+    var slot = slotRaw.replace(/\s*\(.*\)/, '').toLowerCase();
+    var val = dateInput.value;
+    err.hidden = true; ok.hidden = true; box.hidden = true;
+    if (!name) return showError('Indiquez votre prénom pour que le barbier sache qui vient.');
+    if (phone.replace(/\D/g, '').length < 8) return showError('Indiquez votre numéro WhatsApp pour recevoir la confirmation.');
+    if (!val) return showError('Choisissez un jour.');
+    var parts = val.split('-');
+    var day = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    if (day.getDay() === 1) return showError('Le salon est fermé le lundi. Choisissez un autre jour.');
+    var label = day.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    // Repli si le serveur ne répond pas : message à copier et envoyer soi-même
+    function fallback() {
+      out.textContent = 'Bonjour Le Fil du Rasoir,\nJe souhaite réserver : ' + service + '\nLe ' + label + ', ' + slot + '.\nPrénom : ' + name + '\nMerci de me confirmer l’heure.';
+      hint.textContent = defaultHint;
+      box.hidden = false;
+    }
+
+    submitBtn.disabled = true;
+    fetch('/api/reservations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name, phone: phone, service: service, date: val, slot: slotRaw,
+        website: document.getElementById('b-website').value
+      })
+    })
+      .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+      .then(function (r) {
+        if (r.status === 201) {
+          ok.querySelector('b').textContent = 'Merci ' + name + ', votre demande pour le ' + label + ' est bien envoyée.';
+          ok.hidden = false;
+          form.reset();
+          dateInput.value = val;
+        } else if (r.body && r.body.error && r.status < 500) {
+          showError(r.body.error);
+        } else {
+          fallback();
+        }
+      })
+      .catch(fallback)
+      .then(function () { submitBtn.disabled = false; });
+  });
+
+  document.getElementById('b-copy').addEventListener('click', function () {
+    var text = out.textContent;
+    function selectText() {
+      var r = document.createRange(); r.selectNodeContents(out);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      hint.textContent = 'Texte sélectionné : copiez-le avec Ctrl+C ou un appui long.';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () {
+        hint.textContent = 'Message copié. Collez-le dans WhatsApp au +225 07 00 00 00 00.';
+      }, selectText);
+    } catch (x) { selectText(); }
+  });
+})();
+</script>
+</body>
+</html>
